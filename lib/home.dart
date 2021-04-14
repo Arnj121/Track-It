@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'database.dart';
 
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -31,7 +30,7 @@ class _HomeState extends State<Home> {
   void refresh() async{
     var snackbar = SnackBar(
       content: Text(
-        'refreshing',
+        'refreshed',
         style: GoogleFonts.openSans(),
       ),
     );
@@ -41,15 +40,7 @@ class _HomeState extends State<Home> {
     itm.forEach((element) {temp.add(jsonDecode(jsonEncode(element)));});
     this.setState(() {
       this.items=temp;
-      snackbar = SnackBar(
-        content: Text(
-          'refreshed',
-          style: GoogleFonts.openSans(),
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     });
-
   }
 
 
@@ -77,8 +68,8 @@ class _HomeState extends State<Home> {
                       color: Colors.redAccent,
                     ),
                     onPressed: (){
-                      Navigator.pushReplacementNamed(context, '/');
-                      // this.refresh();
+                      // Navigator.pushReplacementNamed(context, '/');
+                      this.refresh();
                     },
                   )
                 ],
@@ -155,7 +146,11 @@ class _HomeState extends State<Home> {
               BottomNavigationBarItem(
                 icon: IconButton(
                   icon: Icon(Icons.info_outline,size: 30.0,color:Colors.blueAccent),
-                  onPressed: (){Navigator.pushNamed(context, '/info',arguments:this.items);},
+                  onPressed: ()async{
+                    dynamic ret = await Navigator.pushNamed(context, '/info',arguments:this.items);
+                    if(ret['refresh']==1)
+                      this.refresh();
+                    },
                 ),
                 label:'Info',
               ),
@@ -352,56 +347,6 @@ class _HomeState extends State<Home> {
             children: [
               IconButton(
                   icon: Icon(
-                    Icons.add,
-                    size: 30.0,
-                    color: Colors.blueAccent,
-                  ),
-                  onPressed: ()async{
-                    dynamic price = this.editController.text;
-                    if(price.length==0){
-                      var snackBar = SnackBar(
-                          content: Text(
-                            'Enter a value to add',
-                            style: GoogleFonts.openSans(),
-                          ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                    else {
-                      price = int.parse(price);
-                      var l = jsonDecode(jsonEncode(this.items[this.index]));
-                      l['spent'] = this.editingPrice+price;
-                      await db.update(l);
-                      l['date']=DateTime.now().toString();
-                      l['parentId']=l['id'];l['id'] = rnd.nextInt(10000);l['changed']=price;
-                      await db.insertHistory(l);
-                      this.setState(() {
-                        this.editingPrice+=price;
-                        this.items[this.index]['spent']=this.editingPrice;
-                      });
-                    }
-                  }
-              ),
-              Container(
-                child: TextField(
-                  controller: this.editController,
-                  decoration:InputDecoration(
-                    labelText: 'Enter a value to add',
-                    labelStyle: GoogleFonts.openSans(),
-                    contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 5.0),
-                    border: UnderlineInputBorder(),
-                  ) ,
-                  keyboardType: TextInputType.number ,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                ),
-                margin: EdgeInsets.symmetric(vertical: 2.0,horizontal: 10.0),
-                height: 50.0,
-                width: 100.0,
-              ),
-              IconButton(
-                  icon: Icon(
                     Icons.remove,
                     color: Colors.redAccent,
                     size: 30.0,
@@ -451,6 +396,57 @@ class _HomeState extends State<Home> {
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
+                    }
+                  }
+                  ),
+              Container(
+                child: TextField(
+                  controller: this.editController,
+                  textAlign: TextAlign.center,
+                  decoration:InputDecoration(
+                    labelText: 'Enter a value to add',
+                    labelStyle: GoogleFonts.openSans(),
+                    contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 5.0),
+                    border: UnderlineInputBorder(),
+                  ) ,
+                  keyboardType: TextInputType.number ,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                margin: EdgeInsets.symmetric(vertical: 2.0,horizontal: 10.0),
+                height: 50.0,
+                width: 100.0,
+              ),
+              IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30.0,
+                    color: Colors.blueAccent,
+                  ),
+                  onPressed: ()async{
+                    dynamic price = this.editController.text;
+                    if(price.length==0){
+                      var snackBar = SnackBar(
+                        content: Text(
+                          'Enter a value to add',
+                          style: GoogleFonts.openSans(),
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                    else {
+                      price = int.parse(price);
+                      var l = jsonDecode(jsonEncode(this.items[this.index]));
+                      l['spent'] = this.editingPrice+price;
+                      await db.update(l);
+                      l['date']=DateTime.now().toString();
+                      l['parentId']=l['id'];l['id'] = rnd.nextInt(10000);l['changed']=price;
+                      await db.insertHistory(l);
+                      this.setState(() {
+                        this.editingPrice+=price;
+                        this.items[this.index]['spent']=this.editingPrice;
+                      });
                     }
                   }
               ),

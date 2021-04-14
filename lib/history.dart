@@ -11,15 +11,17 @@ class History extends StatefulWidget {
 class _HistoryState extends State<History> {
 
   List<Map<String,dynamic>> history=[];
+  int empty=0;
 
   Future<void> loadHistory() async{
     DatabaseHelper db=DatabaseHelper.instance;
     dynamic id = ModalRoute.of(context).settings.arguments;
     List<Map<String,dynamic>> h = await db.queryHistory(id['id']);
     this.setState(() {
+      if(h.length==0)
+        empty=1;
       this.history=h;
     });
-    // print(21);
   }
 
 
@@ -42,6 +44,27 @@ class _HistoryState extends State<History> {
               ),
               backgroundColor: Colors.white,
               titleSpacing: 2.0,
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                      (BuildContext context,int index){
+                        if(empty==1)
+                          return Center(
+                            child: Container(
+                              child: Text(
+                                'No history found for this card',
+                                style: GoogleFonts.openSans(
+                                  color: Colors.redAccent[400],
+                                  fontSize: 20.0
+                                ),
+                              ),
+                              margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0),
+                            ),
+                          );
+                        else return null;
+                  },
+                  childCount: 1
+              ),
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(

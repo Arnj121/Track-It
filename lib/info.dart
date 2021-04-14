@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'database.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+
 class Info extends StatefulWidget {
   @override
   _InfoState createState() => _InfoState();
@@ -19,8 +21,9 @@ class _InfoState extends State<Info> {
   int spentToday=0,monthSpend=0;
   List<Map<String,dynamic>> dates=[];
   DatabaseHelper db = DatabaseHelper.instance;
+  dynamic todayCard={};
   int notCal=1;
-  Future<void> getHistory() async {
+  Future<void> loadData() async {
     this.month=today.month;
     this.day=today.day;
     this.year = today.year;
@@ -30,10 +33,16 @@ class _InfoState extends State<Info> {
       var date = DateTime.parse(element['date']);
       if(date.month==this.month && date.year == this.year){
         this.monthSpend+=element['changed'];
-        if(date.day == this.day)
+        if(date.day == this.day){
           this.spentToday+=element['changed'];
+          if(this.todayCard.containsKey(element['parentId']))
+            this.todayCard[element['parentId']]['spent']+=element['changed'];
+          else
+            this.todayCard[element['parentId']] = {'id':element['parentId'],'name':element['name'],'spent':element['changed']};
+        }
       }
     });
+    this.todayCard =  this.todayCard.values.toList();
     items=ModalRoute.of(context).settings.arguments;
     items.forEach((element) {
       if(element['spent']>this.spendings[0]['spent']){
@@ -48,6 +57,7 @@ class _InfoState extends State<Info> {
     this.setState(() {
       this.spentToday=this.spentToday;
       this.monthSpend=this.monthSpend;
+      this.todayCard=this.todayCard;
       if(this.items.length>0)
         this.notCal=0;
     });
@@ -56,7 +66,7 @@ class _InfoState extends State<Info> {
   @override
   void initState() {
     super.initState();
-    this.getHistory();
+    this.loadData();
   }
 
   @override
@@ -128,18 +138,32 @@ class _InfoState extends State<Info> {
                               padding: EdgeInsets.all(5.0),
                               margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 5.0),
                             ),
-                            Container(
-                              child: Text(
-                                'All time Spending',
-                                style: GoogleFonts.openSans(
-                                  color: Colors.blueGrey[900],
-                                  fontSize: 20.0
-                                ),
-                              ),
-                              margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
-                            )
                           ]
-                  )),
+                      )
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                            (BuildContext context,int index){
+                          return TodayCardBuilder(index);
+                        },
+                        childCount:this.todayCard.length
+                    ),
+                  ),
+                  SliverList(delegate: SliverChildListDelegate(
+                      [
+                        Container(
+                          child: Text(
+                            'All time Spending',
+                            style: GoogleFonts.openSans(
+                            color: Colors.blueGrey[900],
+                            fontSize: 20.0
+                            ),
+                          ),
+                          margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
+                        )
+                      ]
+                    )
+                  ),
                   SliverGrid(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 1,
@@ -196,7 +220,7 @@ class _InfoState extends State<Info> {
                                 ),
                                 SizedBox(height: 10.0),
                                 Text(
-                                  'RS '+this.monthSpend.toString()+'.00',
+                                  'Rs '+this.monthSpend.toString()+'.00',
                                   style: GoogleFonts.openSans(
                                       fontSize: 20.0,
                                       color: Colors.white
@@ -211,6 +235,71 @@ class _InfoState extends State<Info> {
                               borderRadius: BorderRadius.circular(5.0),
                               color: Colors.deepOrange[300]
                             ),
+                          ),
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  child: Icon(
+                                    Icons.info_outline,
+                                    color: Colors.amberAccent,
+                                  ),
+                                  margin: EdgeInsets.symmetric(vertical: 0,horizontal: 5.0),
+                                ),
+                                Text(
+                                  'Spendings will reset Every Month',
+                                  style: GoogleFonts.openSans(),
+                                ),
+                              ],
+                            ),
+                            padding: EdgeInsets.all(5.0),
+                            margin: EdgeInsets.all(10.0),
+                          ),
+                          Container(
+                            child: Column(
+                              children: [
+
+                                Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        child: Icon(
+                                          Icons.warning_amber_sharp,
+                                          color:Colors.redAccent[400]
+                                        ),
+                                        margin: EdgeInsets.symmetric(vertical: 0,horizontal: 5.0),
+                                      ),
+                                      TextButton(
+                                        child:Text(
+                                          'Erase all the data',
+                                          style: GoogleFonts.openSans(
+                                            fontSize: 15.0
+                                          ),
+                                        ),
+                                        onPressed: (){
+                                          db.deleteHistory();
+                                          Navigator.pop(context);
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                  margin: EdgeInsets.all(5.0),
+                                ),
+                                Container(
+                                  child: Text(
+                                    '(This includes card data and history)',
+                                    style: GoogleFonts.openSans(),
+                                  ),
+                                  margin: EdgeInsets.all(0),
+                                )
+                              ],
+                            ),
+                            padding: EdgeInsets.all(5.0),
+                            margin: EdgeInsets.all(10.0),
                           )
                         ]
                       )
@@ -226,11 +315,9 @@ class _InfoState extends State<Info> {
                 children: [
                   Container(
                     child: TextButton.icon(
-                        onPressed: (){
-                          db.deleteHistory();
-                          this.setState(() {
-
-                          });
+                        onPressed: () async{
+                          await db.resetToday();
+                          Navigator.pop(context,{'refresh':1});
                         },
                         icon: Icon(
                           Icons.restore,
@@ -287,6 +374,43 @@ class _InfoState extends State<Info> {
       ),
     );
   }
+  Container TodayCardBuilder(int index){
+    return Container(
+      child: ListTile(
+        leading: Icon(
+          Icons.money_sharp,
+          size: 30.0,
+          color: Colors.white,
+        ),
+        title: Text(
+          this.todayCard[index]['name'],
+          style: GoogleFonts.openSans(
+              color: Colors.white,
+              fontSize: 25.0
+          ),
+        ),
+        trailing: Text(
+          'Rs '+this.todayCard[index]['spent'].toString()+'.00',
+          style: GoogleFonts.openSans(
+              color: Colors.white
+          ),
+        ),
+        subtitle: Text(
+          'Spent today ',
+          style: GoogleFonts.openSans(
+            color: Colors.white,
+          ),
+        ),
+        tileColor: Colors.redAccent[400],
+        onTap: (){Navigator.pushNamed(context, '/history',arguments: {'id':this.todayCard[index]['id']});},
+      ),
+      margin: EdgeInsets.symmetric(vertical: 3.0,horizontal: 5.0),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5.0)
+      ),
+    );
+  }
+
   Container buildSpentRank(int index){
     return Container(
       child: Column(

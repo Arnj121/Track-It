@@ -55,6 +55,34 @@ class DatabaseHelper{
     await db.delete(table,where: 'id = ?',whereArgs: [items['id']]);
   }
 
+  Future<int> resetToday() async{
+    Database db = await database;
+    int today = DateTime.now().day;
+    List<Map<String,dynamic>> his = await db.query('history',
+        columns: ['id','parentId','name','changed','spent','date']);
+    dynamic resetVal = {};
+    his.forEach((element) async{
+      int d = DateTime.parse(element['date']).day;
+      if(d==today){
+        if(resetVal.containsKey(element['parentId'])){
+          resetVal[element['parentId']]['changed']+=element['changed'];
+        }else{
+          resetVal[element['parentId']]={'id':element['parentId'],'changed':element['changed']};
+        }
+        await db.delete('history',where: 'id =?',whereArgs: [element['id']]);
+      }
+    });
+    resetVal = resetVal.values;
+    resetVal.forEach((element) async{
+      dynamic spent = await db.query(table,columns:['spent'],where: 'id= ?',whereArgs: [element['id']]);
+      await db.update(table, {'spent':spent[0]['spent']-element['changed']},where: 'id = ?',whereArgs: [element['id']]);
+    });
+    // print(await this.query());
+    return 1;
+    // print(await this.queryHistory(0));
+
+  }
+
   Future<void> update(Map<String,dynamic> items) async{
     Database db = await database;
     // print(items);
