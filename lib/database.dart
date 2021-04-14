@@ -145,6 +145,34 @@ class DatabaseHelper{
     }
   }
 
+  Future<int> getTodaySpending() async{
+    Database db = await database;
+    dynamic h=await db.query('history',columns: ['changed','date']);
+    int value=0;
+    int d = DateTime.now().day;
+    h.forEach((element){
+      int day = DateTime.parse(element['date']).day;
+      if(d==day)
+        value+=element['changed'];
+    });
+    // print(value);print(158);
+    return value;
+  }
+
+  Future<int> getMonthSpending()async{
+    Database db = await database;
+    dynamic h=await db.query('history',columns: ['changed','date']);
+    int value=0;
+    int d = DateTime.now().month;
+    h.forEach((element){
+      int day = DateTime.parse(element['date']).month;
+      if(d==day)
+        value+=element['changed'];
+    });
+    // print(value);print(172);
+    return value;
+  }
+
   Future<int> insertHistory(Map<String,dynamic> items)async {
     Database db = await database;
     // print(items);
@@ -156,6 +184,7 @@ class DatabaseHelper{
     Database db = await database;
     await db.delete('history',where: '1=1');
     await db.delete(table,where: '1=1');
+    await db.update('limits', {'limitval':0},where: '1=1');
     // await db.update(table, {'spent':0},where: '1=1');
     // print(await this.query());
   }

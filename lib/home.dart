@@ -26,7 +26,7 @@ class _HomeState extends State<Home> {
   TextEditingController priceController = TextEditingController();
   TextEditingController editController = TextEditingController();
   String editingName;int editingPrice;
-
+  int todaySpending,monthSpending;
   void refresh() async{
     var snackbar = SnackBar(
       content: Text(
@@ -43,9 +43,14 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void init() async{
+    this.todaySpending=await db.getTodaySpending();
+    this.monthSpending=await db.getMonthSpending();
+  }
 
   @override
   Widget build(BuildContext context) {
+    this.init();
     this.items=items.isNotEmpty? items : ModalRoute.of(context).settings.arguments;
     this.empty = this.items.length==0 ? 1 : 0;
     this.crossAxisCount = this.empty == 1 ? 1 : 2;
@@ -243,7 +248,17 @@ class _HomeState extends State<Home> {
                       'Card created',
                       style: GoogleFonts.openSans(),
                     ),
+                    duration:Duration(milliseconds: 500) ,
                   );
+                  if(price>this.todaySpending || price>this.monthSpending){
+                    snackbar = SnackBar(
+                      content: Text(
+                        'Expenses Limit reached',
+                        style: GoogleFonts.openSans(),
+                      ),
+                      action: SnackBarAction(label: 'View info', onPressed: (){Navigator.pushNamed(context, '/info',arguments: this.items);}),
+                    );
+                  }
                   ScaffoldMessenger.of(context).showSnackBar(snackbar);
                   await db.insertHistory(l1);
                   this.setState(() {
@@ -393,6 +408,7 @@ class _HomeState extends State<Home> {
                             'price updated',
                             style: GoogleFonts.openSans(),
                           ),
+                          duration: Duration(milliseconds: 500),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
@@ -443,6 +459,24 @@ class _HomeState extends State<Home> {
                       l['date']=DateTime.now().toString();
                       l['parentId']=l['id'];l['id'] = rnd.nextInt(10000);l['changed']=price;
                       await db.insertHistory(l);
+                      var snackBar = SnackBar(
+                        content: Text(
+                          'price updated',
+                          style: GoogleFonts.openSans(),
+                        ),
+                        duration: Duration(milliseconds: 500),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      if(this.editingPrice+price>this.todaySpending || this.editingPrice+price>this.monthSpending){
+                        var snackbar = SnackBar(
+                          content: Text(
+                            'Expenses Limit reached',
+                            style: GoogleFonts.openSans(),
+                          ),
+                          action: SnackBarAction(label: 'View info', onPressed: (){Navigator.pushNamed(context, '/info',arguments: this.items);}),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      }
                       this.setState(() {
                         this.editingPrice+=price;
                         this.items[this.index]['spent']=this.editingPrice;

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -58,17 +60,23 @@ class _InfoState extends State<Info> {
         this.spendings[1]['spent'] = element['spent'];
       }
     });
-    limit = await db.getLimits();
-    limit.forEach((element){
-      if(element['name']=='daily')
-        this.daily.text=element['limitval'].toString();
-      else if(element['name']=='monthly')
-        this.monthly.text=element['limitval'].toString();
-    });
+    dynamic temp = await db.getLimits();
+    temp.forEach((element){limit.add(jsonDecode(jsonEncode(element)));});
+    for(int i=0;i<limit.length;i++){
+      if(limit[i]['name']=='daily') {
+        this.daily.text = limit[i]['limitval'].toString();
+        limit[i]['value']=await db.getTodaySpending();
+      }
+      else if(limit[i]['name']=='monthly') {
+        this.monthly.text = limit[i]['limitval'].toString();
+         limit[i]['value']=await db.getMonthSpending();
+      }
+    }
     this.setState(() {
       this.spentToday=this.spentToday;
       this.monthSpend=this.monthSpend;
       this.todayCard=this.todayCard;
+      this.limit = this.limit;
       if(this.items.length>0)
         this.notCal=0;
     });
@@ -98,6 +106,17 @@ class _InfoState extends State<Info> {
                       ),
                     ),
                     pinned: true,
+                  ),
+                  SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                        (BuildContext context,int index){
+                            return this.ProgressLimit(this.limit[index]);
+                        },
+                      childCount: this.limit.length
+                    ),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2
+                    ),
                   ),
                   SliverList(
                       delegate: SliverChildListDelegate(
@@ -543,6 +562,53 @@ class _InfoState extends State<Info> {
       ),
     );
   }
+  Container ProgressLimit(Map<String,dynamic> l) {
+    dynamic v,txt;
+    if(l['limitval']==0) {
+      v = 0.0;
+      txt='0.00 %';
+    }
+    else {
+      v = l['value'] / l['limitval'];
+      if(v>1.0) {
+        v = 1.0;
+        txt='100 %';
+      }
+      else
+        txt = ((l['value'] / l['limitval'])
+            .toStringAsFixed(2)).toString() + ' %';
+    }
+    return Container(
+      child: CircularPercentIndicator(
+        percent:v,
+        radius: 100.0,
+        lineWidth: 5.0,
+        animation: true,
+        animationDuration: 1000,
+        progressColor: Colors.orangeAccent,
+        center: Text(
+          txt,
+          style: GoogleFonts.openSans(
+              fontSize: 20.0,
+              color: Colors.red[300]
+          ),
+        ),
+        footer: Container(
+          child: Text(
+            l['name'] + ' stats',
+            style: GoogleFonts.openSans(
+                color: Colors.redAccent,
+                fontSize: 20.0
+            ),
+          ),
+          margin: EdgeInsets.all(10.0),
+        ),
+        backgroundColor: Colors.orange[50],
+      ),
+      margin: EdgeInsets.all(5.0),
+    );
+  }
+
   Container TodayCardBuilder(int index){
     return Container(
       child: ListTile(
