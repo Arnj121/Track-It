@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'database.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -23,6 +24,9 @@ class _InfoState extends State<Info> {
   DatabaseHelper db = DatabaseHelper.instance;
   dynamic todayCard={};
   int notCal=1;
+  TextEditingController daily = TextEditingController();
+  TextEditingController monthly = TextEditingController();
+  dynamic limit=[];
   Future<void> loadData() async {
     this.month=today.month;
     this.day=today.day;
@@ -54,6 +58,13 @@ class _InfoState extends State<Info> {
         this.spendings[1]['spent'] = element['spent'];
       }
     });
+    limit = await db.getLimits();
+    limit.forEach((element){
+      if(element['name']=='daily')
+        this.daily.text=element['limit'].toString();
+      else if(element['name']=='monthly')
+        this.daily.text=element['limit'].toString();
+    });
     this.setState(() {
       this.spentToday=this.spentToday;
       this.monthSpend=this.monthSpend;
@@ -74,11 +85,7 @@ class _InfoState extends State<Info> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              child: CustomScrollView(
+        body: CustomScrollView(
                 slivers: [
                   SliverAppBar(
                     leading: BackButton(color: Colors.redAccent),
@@ -95,6 +102,18 @@ class _InfoState extends State<Info> {
                   SliverList(
                       delegate: SliverChildListDelegate(
                           [
+                            Center(
+                              child: Container(
+                                child: Text(
+                                  'Daily Spending Stats',
+                                  style: GoogleFonts.openSans(
+                                      color: Colors.blueGrey[900],
+                                      fontSize: 20.0
+                                  ),
+                                ),
+                                margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
+                              ),
+                            ),
                             Container(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -151,15 +170,18 @@ class _InfoState extends State<Info> {
                   ),
                   SliverList(delegate: SliverChildListDelegate(
                       [
-                        Container(
-                          child: Text(
-                            'All time Spending',
-                            style: GoogleFonts.openSans(
-                            color: Colors.blueGrey[900],
-                            fontSize: 20.0
+                        Divider(color: Colors.grey[600],height: 30.0,),
+                        Center(
+                          child: Container(
+                            child: Text(
+                              'All time Spending',
+                              style: GoogleFonts.openSans(
+                              color: Colors.blueGrey[900],
+                              fontSize: 20.0
+                              ),
                             ),
+                            margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
                           ),
-                          margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
                         )
                       ]
                     )
@@ -194,7 +216,7 @@ class _InfoState extends State<Info> {
                   SliverList(
                       delegate:SliverChildListDelegate(
                         [
-                          Divider(color: Colors.grey[400],),
+                          Divider(color: Colors.grey[400],height: 30.0,),
                           Container(
                             child: Text(
                               'This month\'s spending',
@@ -236,6 +258,159 @@ class _InfoState extends State<Info> {
                               color: Colors.deepOrange[300]
                             ),
                           ),
+                          Divider(height: 30.0,color: Colors.grey[600]),
+                          Container(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  child: Text(
+                                    'Set a Daily Limit',
+                                    style: GoogleFonts.openSans(
+                                      color: Colors.white,
+                                      fontSize: 20.0
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.all(5.0),
+                                ),
+                                Container(
+                                  child: TextField(
+                                    controller: this.daily,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
+                                        border: UnderlineInputBorder()
+                                    ),
+                                  ),
+                                  height: 50.0,
+                                  width: 100.0,
+                                ),
+                                Container(
+                                  child: TextButton(
+                                    child: Text(
+                                      'Set',
+                                      style: GoogleFonts.openSans(
+                                        fontSize: 20.0,
+                                        color: Colors.blueAccent
+                                      ),
+                                    ),
+                                    onPressed: ()async{
+                                      dynamic val = this.daily.text;
+                                      if(val.length == 0){
+                                        var sb = SnackBar(
+                                            content: Text(
+                                              'Enter a Value',
+                                              style: GoogleFonts.openSans(),
+                                            )
+                                        );
+                                        ScaffoldMessenger.of(context).showSnackBar(sb);
+                                      }
+                                      else{
+                                        val = int.parse(val);
+                                        await db.updateLimit('daily', val);
+                                        var sb = SnackBar(
+                                            content: Text(
+                                              'Daily limit set',
+                                              style: GoogleFonts.openSans(),
+                                            )
+                                        );
+                                        ScaffoldMessenger.of(context).showSnackBar(sb);
+                                      }
+                                    },
+                                  ),
+                                  margin: EdgeInsets.all(5.0),
+                                )
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5.0),
+                              color: Colors.redAccent[400]
+                            ),
+                            margin: EdgeInsets.symmetric(vertical:10.0,horizontal:5.0),
+                            padding: EdgeInsets.symmetric(vertical:10.0,horizontal:5.0),
+
+                          ),
+                          Container(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  child: Text(
+                                    'Set a Monthly Limit',
+                                    style: GoogleFonts.openSans(
+                                        color: Colors.white,
+                                        fontSize: 20.0
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.all(5.0),
+                                ),
+                                Container(
+                                  child: TextField(
+                                    controller: this.monthly,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
+                                        border: UnderlineInputBorder()
+                                    ),
+                                  ),
+                                  height: 50.0,
+                                  width:100.0,
+                                ),
+                                Container(
+                                  child: TextButton(
+                                    child: Text(
+                                      'Set',
+                                      style: GoogleFonts.openSans(
+                                          fontSize: 20.0,
+                                          color: Colors.blueAccent
+                                      ),
+                                    ),
+                                    onPressed: ()async{
+                                      dynamic val = this.monthly.text;
+                                      if(val.length == 0){
+                                        var sb = SnackBar(
+                                            content: Text(
+                                                'Enter a Value',
+                                                style: GoogleFonts.openSans(),
+                                            )
+                                        );
+                                        ScaffoldMessenger.of(context).showSnackBar(sb);
+                                      }
+                                      else{
+                                        val = int.parse(val);
+                                        await db.updateLimit('monthly', val);
+                                        var sb = SnackBar(
+                                            content: Text(
+                                              'Monthly limit set',
+                                              style: GoogleFonts.openSans(),
+                                            )
+                                        );
+                                        ScaffoldMessenger.of(context).showSnackBar(sb);
+                                      }
+                                    },
+                                  ),
+                                  margin: EdgeInsets.all(5.0),
+                                )
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0),
+                                color: Colors.redAccent[400]
+                            ),
+                            margin: EdgeInsets.symmetric(vertical:10.0,horizontal:5.0),
+                            padding: EdgeInsets.symmetric(vertical:10.0,horizontal:5.0),
+                          ),
+
                           Container(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -260,7 +435,6 @@ class _InfoState extends State<Info> {
                           Container(
                             child: Column(
                               children: [
-
                                 Container(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -304,72 +478,39 @@ class _InfoState extends State<Info> {
                         ]
                       )
                   )
-                ],
-              ),
-              height: MediaQuery.of(context).size.height*0.85,
+                ]
             ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    child: TextButton.icon(
-                        onPressed: () async{
-                          await db.resetToday();
-                          Navigator.pop(context,{'refresh':1});
-                        },
-                        icon: Icon(
-                          Icons.restore,
-                          size: 30.0,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          'Reset',
-                          style: GoogleFonts.openSans(
-                            color: Colors.white,
-                            fontSize: 20.0
-                          ),
-                        ),
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100.0),
-                      color: Colors.redAccent
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 0.0,horizontal: 5.0),
-                    margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 5.0),
-                    height: MediaQuery.of(context).size.width*0.15,
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.white,
+            items:[
+              BottomNavigationBarItem(
+                icon:IconButton(
+                  onPressed: () async{
+                    await db.resetToday();
+                    Navigator.pop(context,{'refresh':1});
+                  },
+                  icon: Icon(
+                    Icons.sync,
+                    size: 30.0,
+                    color: Colors.redAccent,
                   ),
-                  Container(
-                    child: TextButton.icon(
-                      onPressed: (){
-                        Navigator.pushNamed(context, '/choosecard',arguments: this.items);
-                      },
-                      icon: Icon(
-                        Icons.history_outlined,
-                        size: 30.0,
-                        color: Colors.white,
-                      ),
-                      label: Text(
-                        'History',
-                        style: GoogleFonts.openSans(
-                            color: Colors.white,
-                            fontSize: 20.0
-                        ),
-                      ),
-                    ),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100.0),
-                        color: Colors.redAccent,
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 0.0,horizontal: 5.0),
-                    margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 5.0),
-                    height: MediaQuery.of(context).size.width*0.15,
-                  )
-                ],
+                ),
+                label: 'Reset',
               ),
-            )
-          ],
+              BottomNavigationBarItem(
+                icon: IconButton(
+                  onPressed: (){
+                    Navigator.pushNamed(context, '/choosecard',arguments: this.items);
+                  },
+                  icon: Icon(
+                    Icons.history_outlined,
+                    size: 30.0,
+                    color: Colors.redAccent,
+                  ),
+                ),
+                label: 'History'
+              )
+          ]
         ),
       ),
     );
