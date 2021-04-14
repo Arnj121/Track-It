@@ -59,6 +59,7 @@ class _HistoryState extends State<History> {
                                 ),
                               ),
                               margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0),
+                              padding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0),
                             ),
                           );
                         else return null;

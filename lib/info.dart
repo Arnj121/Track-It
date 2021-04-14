@@ -61,9 +61,9 @@ class _InfoState extends State<Info> {
     limit = await db.getLimits();
     limit.forEach((element){
       if(element['name']=='daily')
-        this.daily.text=element['limit'].toString();
+        this.daily.text=element['limitval'].toString();
       else if(element['name']=='monthly')
-        this.daily.text=element['limit'].toString();
+        this.monthly.text=element['limitval'].toString();
     });
     this.setState(() {
       this.spentToday=this.spentToday;
@@ -286,6 +286,9 @@ class _InfoState extends State<Info> {
                                         contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
                                         border: UnderlineInputBorder()
                                     ),
+                                    style: GoogleFonts.openSans(
+                                      color: Colors.white
+                                    ),
                                   ),
                                   height: 50.0,
                                   width: 100.0,
@@ -296,7 +299,7 @@ class _InfoState extends State<Info> {
                                       'Set',
                                       style: GoogleFonts.openSans(
                                         fontSize: 20.0,
-                                        color: Colors.blueAccent
+                                        color: Colors.white70
                                       ),
                                     ),
                                     onPressed: ()async{
@@ -312,14 +315,25 @@ class _InfoState extends State<Info> {
                                       }
                                       else{
                                         val = int.parse(val);
-                                        await db.updateLimit('daily', val);
-                                        var sb = SnackBar(
-                                            content: Text(
-                                              'Daily limit set',
-                                              style: GoogleFonts.openSans(),
-                                            )
-                                        );
-                                        ScaffoldMessenger.of(context).showSnackBar(sb);
+                                        if(val<0){
+                                          var sb = SnackBar(
+                                              content: Text(
+                                                'Limit cannot be negetive',
+                                                style: GoogleFonts.openSans(),
+                                              )
+                                          );
+                                          ScaffoldMessenger.of(context).showSnackBar(sb);
+                                        }else {
+                                          await db.updateLimit('daily', val);
+                                          var sb = SnackBar(
+                                              content: Text(
+                                                'Daily limit set',
+                                                style: GoogleFonts.openSans(),
+                                              )
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(sb);
+                                        }
                                       }
                                     },
                                   ),
@@ -360,7 +374,10 @@ class _InfoState extends State<Info> {
                                     textAlign: TextAlign.center,
                                     decoration: InputDecoration(
                                         contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
-                                        border: UnderlineInputBorder()
+                                        border: UnderlineInputBorder(),
+                                    ),
+                                    style: GoogleFonts.openSans(
+                                      color: Colors.white
                                     ),
                                   ),
                                   height: 50.0,
@@ -372,7 +389,7 @@ class _InfoState extends State<Info> {
                                       'Set',
                                       style: GoogleFonts.openSans(
                                           fontSize: 20.0,
-                                          color: Colors.blueAccent
+                                          color: Colors.white70
                                       ),
                                     ),
                                     onPressed: ()async{
@@ -388,14 +405,25 @@ class _InfoState extends State<Info> {
                                       }
                                       else{
                                         val = int.parse(val);
-                                        await db.updateLimit('monthly', val);
-                                        var sb = SnackBar(
-                                            content: Text(
-                                              'Monthly limit set',
-                                              style: GoogleFonts.openSans(),
-                                            )
-                                        );
-                                        ScaffoldMessenger.of(context).showSnackBar(sb);
+                                        if(val<0){
+                                          var sb = SnackBar(
+                                              content: Text(
+                                                'Limit cannot be negetive',
+                                                style: GoogleFonts.openSans(),
+                                              )
+                                          );
+                                          ScaffoldMessenger.of(context).showSnackBar(sb);
+                                        }else {
+                                          await db.updateLimit('monthly', val);
+                                          var sb = SnackBar(
+                                              content: Text(
+                                                'Monthly limit set',
+                                                style: GoogleFonts.openSans(),
+                                              )
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(sb);
+                                        }
                                       }
                                     },
                                   ),

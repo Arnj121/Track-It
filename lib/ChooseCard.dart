@@ -9,10 +9,12 @@ class ChooseCard extends StatefulWidget {
 class _ChooseCardState extends State<ChooseCard> {
 
   List<Map<String,dynamic>> items=[];
-
+  int empty=0;
   @override
   Widget build(BuildContext context) {
     this.items = ModalRoute.of(context).settings.arguments;
+    if(items.length==0)
+      this.empty=1;
     // print(this.items);
     return SafeArea(
       child: Scaffold(
@@ -31,6 +33,28 @@ class _ChooseCardState extends State<ChooseCard> {
                 ),
               ),
               backgroundColor: Colors.white,
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                      (BuildContext context,int index){
+                        if(empty==1)
+                          return Center(
+                            child: Container(
+                              child: Text(
+                                'No Cards created yet',
+                                style: GoogleFonts.openSans(
+                                    color: Colors.redAccent[400],
+                                    fontSize: 20.0
+                                ),
+                              ),
+                              margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0),
+                              padding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0),
+                            ),
+                          );
+                        else return null;
+                  },
+                  childCount: 1
+              ),
             ),
             SliverList(
                 delegate: SliverChildBuilderDelegate(

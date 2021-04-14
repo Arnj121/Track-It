@@ -148,7 +148,7 @@ class _HomeState extends State<Home> {
                   icon: Icon(Icons.info_outline,size: 30.0,color:Colors.blueAccent),
                   onPressed: ()async{
                     dynamic ret = await Navigator.pushNamed(context, '/info',arguments:this.items);
-                    if(ret['refresh']==1)
+                    if(ret!=null && ret['refresh']==1)
                       this.refresh();
                     },
                 ),

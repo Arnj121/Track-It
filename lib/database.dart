@@ -40,23 +40,23 @@ class DatabaseHelper{
                 spent INTEGER NOT NULL,
                 date TEXT NOT NULL
               )''');
-    await db.execute('''CREATE TABLE limits(
+    await db.execute('''CREATE TABLE limits (
                 id INTEGER PRIMARY KEY,
                 name TEXT NOT NULL,
-                limit INTEGER NOT NULL
+                limitval INTEGER NOT NULL
               )''');
-    await db.insert('limits', {'id':12343,'name':'daily','limit':0});
-    await db.insert('limits', {'id':53452,'name':'monthly','limit':0});
+    await db.insert('limits', {'id':12343,'name':'daily','limitval':0});
+    await db.insert('limits', {'id':53452,'name':'monthly','limitval':0});
   }
 
   Future<List<Map<String,dynamic>>> getLimits ()async {
     Database db = await database;
-    return await db.query('limits',columns: ['id','name','limit']);
+    return await db.query('limits',columns: ['id','name','limitval']);
   }
 
   Future<void> updateLimit(String name,int limit) async{
     Database db = await database;
-    await db.update('limits', {'limit':limit},where: 'name=?',whereArgs: [name]);
+    await db.update('limits', {'limitval':limit},where: 'name=?',whereArgs: [name]);
   }
 
   Future<int> insert(Map<String,dynamic> items) async {
