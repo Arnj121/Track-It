@@ -15,7 +15,6 @@ class _ChooseCardState extends State<ChooseCard> {
     this.items = ModalRoute.of(context).settings.arguments;
     if(items.length==0)
       this.empty=1;
-    // print(this.items);
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -97,13 +96,13 @@ class _ChooseCardState extends State<ChooseCard> {
             color: Colors.white,
           ),
         ),
-        tileColor: Colors.redAccent[400],
         onTap: (){Navigator.pushNamed(context, '/history',arguments: {'id':this.items[index]['id']});},
 
       ),
       margin: EdgeInsets.symmetric(vertical: 3.0,horizontal: 5.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5.0)
+        borderRadius: BorderRadius.circular(10.0),
+        color: Colors.redAccent[400],
       ),
     );
   }

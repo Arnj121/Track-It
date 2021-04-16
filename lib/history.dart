@@ -81,6 +81,7 @@ class _HistoryState extends State<History> {
     );
   }
   Container historyObj(int index){
+    String sign = this.history[index]['changed']>0? '+' : '';
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,7 +91,7 @@ class _HistoryState extends State<History> {
             this.history[index]['name'],
             style: GoogleFonts.openSans(
               fontSize: 20.0,
-              color: Colors.blueGrey
+              color: Colors.white
             ),
           ),
           Column(
@@ -98,10 +99,10 @@ class _HistoryState extends State<History> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                this.history[index]['changed'].toString(),
+                sign+' '+this.history[index]['changed'].toString(),
                 style: GoogleFonts.openSans(
                     fontSize: 15.0,
-                    color: Colors.grey
+                    color: Colors.white
                 ),
               ),
               SizedBox(height: 5.0),
@@ -109,7 +110,7 @@ class _HistoryState extends State<History> {
                 this.history[index]['spent'].toString(),
                 style: GoogleFonts.openSans(
                     fontSize: 20.0,
-                    color: Colors.grey
+                    color: Colors.white
                 ),
               ),
               SizedBox(height: 5.0),
@@ -117,7 +118,7 @@ class _HistoryState extends State<History> {
                 this.history[index]['date'].toString().substring(0,10),
                 style: GoogleFonts.openSans(
                     fontSize: 15.0,
-                    color: Colors.blueAccent
+                    color: Colors.white
                 ),
               )
             ],
@@ -125,8 +126,8 @@ class _HistoryState extends State<History> {
         ],
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5.0),
-        color: Colors.amberAccent
+        borderRadius: BorderRadius.circular(10.0),
+        color: Colors.redAccent[400]
       ),
       padding: EdgeInsets.symmetric(vertical: 5.0,horizontal:10.0),
       margin: EdgeInsets.all(5.0),

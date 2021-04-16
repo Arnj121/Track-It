@@ -171,7 +171,7 @@ class _InfoState extends State<Info> {
                               ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.0),
-                                color: Colors.amber[800]
+                                color: Colors.purple[100]
                               ),
                               padding: EdgeInsets.all(5.0),
                               margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 5.0),
@@ -273,8 +273,8 @@ class _InfoState extends State<Info> {
                             padding: EdgeInsets.all(5.0),
                             margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 5.0),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0),
-                              color: Colors.deepOrange[300]
+                              borderRadius: BorderRadius.circular(100.0),
+                              color: Colors.purple[100]
                             ),
                           ),
                           Divider(height: 30.0,color: Colors.grey[600]),
@@ -331,6 +331,7 @@ class _InfoState extends State<Info> {
                                             )
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(sb);
+                                        FocusScope.of(context).unfocus();
                                       }
                                       else{
                                         val = int.parse(val);
@@ -361,7 +362,7 @@ class _InfoState extends State<Info> {
                               ],
                             ),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0),
+                              borderRadius: BorderRadius.circular(10.0),
                               color: Colors.redAccent[400]
                             ),
                             margin: EdgeInsets.symmetric(vertical:10.0,horizontal:5.0),
@@ -421,6 +422,7 @@ class _InfoState extends State<Info> {
                                             )
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(sb);
+                                        FocusScope.of(context).unfocus();
                                       }
                                       else{
                                         val = int.parse(val);
@@ -451,7 +453,7 @@ class _InfoState extends State<Info> {
                               ],
                             ),
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
+                                borderRadius: BorderRadius.circular(10.0),
                                 color: Colors.redAccent[400]
                             ),
                             margin: EdgeInsets.symmetric(vertical:10.0,horizontal:5.0),
@@ -564,19 +566,36 @@ class _InfoState extends State<Info> {
   }
   Container ProgressLimit(Map<String,dynamic> l) {
     dynamic v,txt;
+    Icon icon;
+    Color color;
     if(l['limitval']==0) {
       v = 0.0;
       txt='0.00 %';
+      icon = Icon(
+        Icons.check_circle_sharp,
+        color: Colors.green,
+      );
+      color = Colors.green;
     }
     else {
       v = l['value'] / l['limitval'];
-      if(v>1.0) {
+      txt = (((l['value'] / l['limitval'])*100)
+          .toStringAsFixed(2)).toString() + ' %';
+      icon = Icon(
+        Icons.check_circle_sharp,
+        color: Colors.green,
+      );
+      color = Colors.green;
+      if (v > 1.0) {
         v = 1.0;
-        txt='100 %';
-      }
-      else
-        txt = ((l['value'] / l['limitval'])
+        icon = Icon(
+          Icons.warning_amber_sharp,
+          color: Colors.redAccent,
+        );
+        txt = (((l['value'] / l['limitval'])*100)
             .toStringAsFixed(2)).toString() + ' %';
+        color = Colors.red[300];
+      }
     }
     return Container(
       child: CircularPercentIndicator(
@@ -585,25 +604,31 @@ class _InfoState extends State<Info> {
         lineWidth: 5.0,
         animation: true,
         animationDuration: 1000,
-        progressColor: Colors.orangeAccent,
+        progressColor: Colors.purpleAccent,
         center: Text(
-          txt,
+          txt.toString(),
           style: GoogleFonts.openSans(
               fontSize: 20.0,
-              color: Colors.red[300]
+              color: color
           ),
         ),
         footer: Container(
-          child: Text(
-            l['name'] + ' stats',
-            style: GoogleFonts.openSans(
-                color: Colors.redAccent,
-                fontSize: 20.0
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              icon,
+              Text(
+                l['name'] + ' stats',
+                style: GoogleFonts.openSans(
+                    color: color,
+                    fontSize: 20.0
+                ),
+              ),
+            ],
           ),
           margin: EdgeInsets.all(10.0),
         ),
-        backgroundColor: Colors.orange[50],
+        backgroundColor: Colors.purple[50],
       ),
       margin: EdgeInsets.all(5.0),
     );
@@ -636,12 +661,12 @@ class _InfoState extends State<Info> {
             color: Colors.white,
           ),
         ),
-        tileColor: Colors.redAccent[400],
         onTap: (){Navigator.pushNamed(context, '/history',arguments: {'id':this.todayCard[index]['id']});},
       ),
       margin: EdgeInsets.symmetric(vertical: 3.0,horizontal: 5.0),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5.0)
+          borderRadius: BorderRadius.circular(100.0),
+        color: Colors.redAccent[400],
       ),
     );
   }
@@ -678,7 +703,7 @@ class _InfoState extends State<Info> {
       padding: EdgeInsets.all(5.0),
       margin: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5.0),
+        borderRadius: BorderRadius.circular(10.0),
         color: Colors.amber[700]
       ),
 
@@ -688,7 +713,7 @@ class _InfoState extends State<Info> {
   Container totalExpenditure(){
     return Container(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
@@ -711,7 +736,6 @@ class _InfoState extends State<Info> {
               fontSize: 20.0
             ),
           ),
-          SizedBox(height: 10.0),
           Text(
             'Rs '+totalSpent.toString()+'.00',
             style: GoogleFonts.openSans(
@@ -722,9 +746,9 @@ class _InfoState extends State<Info> {
         ],
       ),
       padding: EdgeInsets.symmetric(vertical: 5.0,horizontal: 2.0),
-      margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 2.0),
+      margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 5.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5.0),
+        borderRadius: BorderRadius.circular(10.0),
         color: Colors.blueAccent,
       ),
     );

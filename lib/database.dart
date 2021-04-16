@@ -189,4 +189,17 @@ class DatabaseHelper{
     // print(await this.query());
   }
 
+  Future<List<Map<String,dynamic>>> search(String search) async {
+    Database db = await database;
+    List<Map> maps = await db.query(table,
+        columns: ['id', 'name', 'spent'],where: 'name LIKE ?',whereArgs: ['%$search%']);
+    // print(maps);
+    // print(197);
+    if(maps.length>0){
+      return maps;
+    }
+    return [];
+  }
+
+
 }

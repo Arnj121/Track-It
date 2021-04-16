@@ -14,6 +14,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   DatabaseHelper db=DatabaseHelper.instance;
   List<Map<String,dynamic>> items= [];
+  dynamic limit=[];
   List<Color> colors = [Colors.purple[200],Colors.red[300],Colors.pinkAccent[400],Colors.blueAccent,Colors.orange[300],Colors.greenAccent];
   Color nameFontColor=Colors.grey[850];
   Color priceFontColor=Colors.blueGrey[700];
@@ -21,10 +22,11 @@ class _HomeState extends State<Home> {
   Color iconBackColor = Colors.grey[100];
   var rnd = Random();
   Icon icon = Icon(Icons.add,size:30.0,color: Colors.blueAccent);String cmd='Add';
-  int empty,addnew=0,crossAxisCount=1,editing=0,index;
+  int empty,addnew=0,crossAxisCount=1,editing=0,index,search=0;dynamic searchtext='No';
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController editController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
   String editingName;int editingPrice;
   int todaySpending,monthSpending;
   void refresh() async{
@@ -46,6 +48,7 @@ class _HomeState extends State<Home> {
   void init() async{
     this.todaySpending=await db.getTodaySpending();
     this.monthSpending=await db.getMonthSpending();
+    this.limit=await db.getLimits();
   }
 
   @override
@@ -87,6 +90,96 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 backgroundColor: Colors.white,
+              ),
+              SliverList(
+                delegate:SliverChildListDelegate(
+                  [
+                    Container(
+                      child:TextField(
+                        controller: this.searchController,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon:Icon(
+                              Icons.cancel,
+                              color: Colors.grey[850]
+                            ),
+                            onPressed: ()async{
+                              this.searchController.text='';
+                              List<Map<String,dynamic>> result = await db.query(),result1=[];
+                              result.forEach((element) {result1.add(jsonDecode(jsonEncode(element)));});
+                              this.setState(() {
+                                this.search=0;
+                                this.items=result1;
+                              });
+                            },
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.grey[850],
+                          ),
+                          hintText: 'Search cards',
+                          hintStyle: GoogleFonts.openSans(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          contentPadding: EdgeInsets.all(3.0),
+                          fillColor: Colors.white60,
+                        ),
+                        onChanged: (text)async {
+                          if(text.length>2){
+                            dynamic result = await db.search(text);
+                            if(result.length ==0){
+                              this.setState(() {
+                                this.search=1;
+                                this.searchtext='No';
+                              });
+                            }
+                            else {
+                              this.setState(() {
+                                this.search=1;
+                                this.searchtext=result.length;
+                                this.items = result;
+                              });
+                            }
+                          }
+                          else if(this.search==1)
+                            {
+                              List<Map<String,dynamic>> result = await db.query(),result1=[];
+                              result = await db.query();
+                              this.setState(() {
+                                this.search=0;
+                                result.forEach((element) {result1.add(jsonDecode(jsonEncode(element)));});
+                                this.items=result1;
+                             });
+                            }
+                        },
+                      ),
+                      padding: EdgeInsets.all(5.0),
+                      margin: EdgeInsets.symmetric(vertical:10.0,horizontal: 15.0)
+                    ),
+                  ]
+                )
+              ),
+              SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                      (BuildContext context,int index){
+                        if(this.search==1)
+                          return Container(
+                            child: Center(
+                              child: Text(
+                                this.searchtext.toString()+' cards found',
+                                style: GoogleFonts.openSans(
+                                  fontSize: 20.0,
+                                  color: Colors.grey[800]
+                                ),
+                              ),
+                            ),
+                            margin: EdgeInsets.all(10.0),
+                          );
+                        else return null;
+                        },
+                    childCount: 1
+                  )
               ),
               SliverList(
                   delegate: SliverChildBuilderDelegate(
@@ -236,11 +329,12 @@ class _HomeState extends State<Home> {
                 }
                 else{
                   if(price.toString().length==0){price=0;}
+                  price=int.parse(price);
                   int rndid=rnd.nextInt(10000);
-                  Map<String,dynamic> l={'id':rndid,'name':name,'spent':int.parse(price)};
+                  Map<String,dynamic> l={'id':rndid,'name':name,'spent':price};
                   Map<String,dynamic> l1={
-                    'id':rnd.nextInt(10000),'name':name,'changed':int.parse(price),
-                    'spent':int.parse(price),'date':DateTime.now().toString(),'parentId':rndid};
+                    'id':rnd.nextInt(10000),'name':name,'changed':price,
+                    'spent':price,'date':DateTime.now().toString(),'parentId':rndid};
                   await db.insert(l);
                   this.priceController.text='';this.nameController.text='';
                   var snackbar = SnackBar(
@@ -250,7 +344,7 @@ class _HomeState extends State<Home> {
                     ),
                     duration:Duration(milliseconds: 500) ,
                   );
-                  if(price>this.todaySpending || price>this.monthSpending){
+                  if((price>this.limit[0]['limitval'] || price>this.limit[1]['limitval']) && (this.limit[0]['limitval']!=0 || this.limit[1]['limitval']!=0)){
                     snackbar = SnackBar(
                       content: Text(
                         'Expenses Limit reached',
@@ -287,15 +381,13 @@ class _HomeState extends State<Home> {
       decoration: BoxDecoration(
         borderRadius:BorderRadius.circular(10),
         // border: Border.all(width: 1.0,color: Colors.grey[700]),
-        color: Colors.lime[300],
+        color: Colors.purple[100],
       ),
     );
   }
 
   Container addNewItemCard(){
     int l=rnd.nextInt(this.colors.length);
-    // print(l);
-    // print(287);
     return Container(
       child: Center(
         child: TextButton.icon(
@@ -367,7 +459,6 @@ class _HomeState extends State<Home> {
                     size: 30.0,
                   ),
                   onPressed: ()async{
-                    // print(this.editingPrice);
                     dynamic price = this.editController.text;
                     if(price.length==0){
                       var snackBar = SnackBar(
@@ -380,9 +471,7 @@ class _HomeState extends State<Home> {
                     }
                     else {
                       price = int.parse(price);
-                      // print(price);
                       this.editingPrice-=price;
-                      // print(this.editingPrice);
                       if(this.editingPrice<0){
                         var snackBar = SnackBar(
                           content: Text(
@@ -467,7 +556,8 @@ class _HomeState extends State<Home> {
                         duration: Duration(milliseconds: 500),
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      if(this.editingPrice+price>this.todaySpending || this.editingPrice+price>this.monthSpending){
+                      if((this.editingPrice+price>this.limit[0]['limitval'] && this.limit[0]['limitval']!=0) ||
+                          (this.editingPrice+price>this.limit[1]['limitval'] && this.limit[1]['limitval']!=0)){
                         var snackbar = SnackBar(
                           content: Text(
                             'Expenses Limit reached',
@@ -511,8 +601,6 @@ class _HomeState extends State<Home> {
 
   Container griditems(item,int index){
     int l=rnd.nextInt(this.colors.length);
-    // print(l);
-    // print(484);
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

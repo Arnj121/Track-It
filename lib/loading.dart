@@ -15,9 +15,6 @@ class _LoadingState extends State<Loading> {
     List<Map<String,dynamic>> items = await db.query();
     List<Map<String,dynamic>> temp = [];
     items.forEach((element) {temp.add(jsonDecode(jsonEncode(element)));});
-    // print(temp);
-    // print(19);
-    // print(items);
     Navigator.pushReplacementNamed(context, '/home',arguments: temp);
   }
 
