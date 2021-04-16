@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'database.dart';
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -44,6 +43,7 @@ class _HomeState extends State<Home> {
       this.items=temp;
     });
   }
+
 
   void init() async{
     this.todaySpending=await db.getTodaySpending();
@@ -245,6 +245,7 @@ class _HomeState extends State<Home> {
                 icon: IconButton(
                   icon: Icon(Icons.info_outline,size: 30.0,color:Colors.blueAccent),
                   onPressed: ()async{
+                    FocusScope.of(context).unfocus();
                     dynamic ret = await Navigator.pushNamed(context, '/info',arguments:this.items);
                     if(ret!=null && ret['refresh']==1)
                       this.refresh();

@@ -331,7 +331,6 @@ class _InfoState extends State<Info> {
                                             )
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(sb);
-                                        FocusScope.of(context).unfocus();
                                       }
                                       else{
                                         val = int.parse(val);
@@ -353,6 +352,7 @@ class _InfoState extends State<Info> {
                                           );
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(sb);
+                                          FocusScope.of(context).unfocus();
                                         }
                                       }
                                     },
@@ -444,6 +444,7 @@ class _InfoState extends State<Info> {
                                           );
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(sb);
+                                          FocusScope.of(context).unfocus();
                                         }
                                       }
                                     },
