@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'database.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-
 class Info extends StatefulWidget {
   @override
   _InfoState createState() => _InfoState();
@@ -29,6 +28,7 @@ class _InfoState extends State<Info> {
   TextEditingController daily = TextEditingController();
   TextEditingController monthly = TextEditingController();
   dynamic limit=[];
+  String email='arnj121@gmail.com';
   Future<void> loadData() async {
     this.month=today.month;
     this.day=today.day;
@@ -192,11 +192,13 @@ class _InfoState extends State<Info> {
                         Divider(color: Colors.grey[600],height: 30.0,),
                         Center(
                           child: Container(
-                            child: Text(
-                              'All time Spending',
-                              style: GoogleFonts.openSans(
-                              color: Colors.blueGrey[900],
-                              fontSize: 20.0
+                            child: Center(
+                              child: Text(
+                                'All time Spending',
+                                style: GoogleFonts.openSans(
+                                color: Colors.blueGrey[900],
+                                fontSize: 20.0
+                                ),
                               ),
                             ),
                             margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
@@ -237,11 +239,13 @@ class _InfoState extends State<Info> {
                         [
                           Divider(color: Colors.grey[400],height: 30.0,),
                           Container(
-                            child: Text(
-                              'This month\'s spending',
-                              style: GoogleFonts.openSans(
-                                  color: Colors.blueGrey[900],
-                                  fontSize: 20.0
+                            child: Center(
+                              child: Text(
+                                'This month\'s spending',
+                                style: GoogleFonts.openSans(
+                                    color: Colors.blueGrey[900],
+                                    fontSize: 20.0
+                                ),
                               ),
                             ),
                             margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
@@ -278,6 +282,18 @@ class _InfoState extends State<Info> {
                             ),
                           ),
                           Divider(height: 30.0,color: Colors.grey[600]),
+                          Container(
+                            child: Center(
+                              child: Text(
+                                'Set limits',
+                                style: GoogleFonts.openSans(
+                                    color: Colors.blueGrey[900],
+                                    fontSize: 20.0
+                                ),
+                              ),
+                            ),
+                            margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 10.0),
+                          ),
                           Container(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -523,6 +539,56 @@ class _InfoState extends State<Info> {
                               ],
                             ),
                             padding: EdgeInsets.all(5.0),
+                            margin: EdgeInsets.all(10.0),
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Text(
+                                    'About the developer'
+                                  ),
+                                ),
+                                SizedBox(height: 20.0,),
+                                Text(
+                                  "Email-Id",
+                                  style: GoogleFonts.openSans()
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      child: Icon(
+                                        Icons.email_sharp,
+                                        color: Colors.orange,
+                                      ),
+                                      margin: EdgeInsets.all(5.0),
+                                    ),
+                                    TextButton(
+                                        child:Text(
+                                          email,
+                                          style: GoogleFonts.openSans(
+                                              decoration: TextDecoration.underline
+                                          ),
+                                        ),
+                                      onPressed: (){
+                                          Clipboard.setData(ClipboardData(text:email));
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text(
+                                                'Copied to clipboard',
+                                                style: GoogleFonts.openSans(),
+                                                ),
+                                                duration: Duration(milliseconds: 600)
+                                              )
+                                          );
+                                      }
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
                             margin: EdgeInsets.all(10.0),
                           )
                         ]
