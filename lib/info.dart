@@ -33,7 +33,7 @@ class _InfoState extends State<Info> {
     this.month=today.month;
     this.day=today.day;
     this.year = today.year;
-    this.dates = await db.queryHistory(0);
+    this.dates = await db.queryHistory(0,0,0);
     this.dates.forEach((element) {
       this.totalSpent+=element['changed'];
       var date = DateTime.parse(element['date']);
@@ -260,7 +260,7 @@ class _InfoState extends State<Info> {
                                   'Money spent this month',
                                   style: GoogleFonts.openSans(
                                     fontSize: 20.0,
-                                    color: Colors.white60
+                                    color: Colors.blueGrey[600]
                                   ),
                                 ),
                                 SizedBox(height: 10.0),
@@ -277,7 +277,7 @@ class _InfoState extends State<Info> {
                             padding: EdgeInsets.all(5.0),
                             margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 5.0),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100.0),
+                              borderRadius: BorderRadius.circular(10.0),
                               color: Colors.purple[100]
                             ),
                           ),
@@ -334,7 +334,7 @@ class _InfoState extends State<Info> {
                                       'Set',
                                       style: GoogleFonts.openSans(
                                         fontSize: 20.0,
-                                        color: Colors.white70
+                                        color: Colors.white
                                       ),
                                     ),
                                     onPressed: ()async{
@@ -425,7 +425,7 @@ class _InfoState extends State<Info> {
                                       'Set',
                                       style: GoogleFonts.openSans(
                                           fontSize: 20.0,
-                                          color: Colors.white70
+                                          color: Colors.white
                                       ),
                                     ),
                                     onPressed: ()async{
@@ -732,7 +732,7 @@ class _InfoState extends State<Info> {
       ),
       margin: EdgeInsets.symmetric(vertical: 3.0,horizontal: 5.0),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100.0),
+          borderRadius: BorderRadius.circular(10.0),
         color: Colors.redAccent[400],
       ),
     );

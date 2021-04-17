@@ -61,8 +61,6 @@ class DatabaseHelper{
 
   Future<int> insert(Map<String,dynamic> items) async {
     Database db = await database;
-    // print(items);
-    // print(45);
     int id = await db.insert(table, items);
     return id;
   }
@@ -94,16 +92,12 @@ class DatabaseHelper{
       dynamic spent = await db.query(table,columns:['spent'],where: 'id= ?',whereArgs: [element['id']]);
       await db.update(table, {'spent':spent[0]['spent']-element['changed']},where: 'id = ?',whereArgs: [element['id']]);
     });
-    // print(await this.query());
     return 1;
-    // print(await this.queryHistory(0));
 
   }
 
   Future<void> update(Map<String,dynamic> items) async{
     Database db = await database;
-    // print(items);
-    // print(60);
     await db.update(table,items,where: 'id = ?',whereArgs: [items['id']]);
   }
 
@@ -111,33 +105,29 @@ class DatabaseHelper{
     Database db = await database;
     List<Map> maps = await db.query(table,
         columns: ['id', 'name', 'spent']);
-    // print(maps);
-    // print(66);
     if(maps.length>0){
       return maps;
     }
     return [];
   }
 
-  Future<List<Map<String,dynamic>>> queryHistory(int id) async{
+  Future<List<Map<String,dynamic>>> queryHistory(int id,int sortspend,asc) async{
     Database db = await database;
     if(id==0){
       List<Map> maps = await db.query('history',
           columns: ['id', 'parentId', 'name', 'changed', 'spent', 'date']);
-      // print(maps);
-      // print(83);
       if (maps.length > 0) {
         return maps;
       }
       return [];
     }
     else {
+      String orderby =sortspend==1 ? 'parentId =? order by changed':'parentId =? order by date';
+      orderby = asc ==1 && sortspend==1? orderby+' asc' : orderby +' desc';
       List<Map> maps = await db.query('history',
           columns: ['id', 'parentId', 'name', 'changed', 'spent', 'date'],
-          where: 'parentId =?',
+          where: orderby,
           whereArgs: [id]);
-      // print(maps);
-      // print(95);
       if (maps.length > 0) {
         return maps;
       }
@@ -155,7 +145,6 @@ class DatabaseHelper{
       if(d==day)
         value+=element['changed'];
     });
-    // print(value);print(158);
     return value;
   }
 
@@ -169,14 +158,11 @@ class DatabaseHelper{
       if(d==day)
         value+=element['changed'];
     });
-    // print(value);print(172);
     return value;
   }
 
   Future<int> insertHistory(Map<String,dynamic> items)async {
     Database db = await database;
-    // print(items);
-    // print(87);
     int id = await db.insert('history', items);
     return id;
   }
@@ -185,21 +171,22 @@ class DatabaseHelper{
     await db.delete('history',where: '1=1');
     await db.delete(table,where: '1=1');
     await db.update('limits', {'limitval':0},where: '1=1');
-    // await db.update(table, {'spent':0},where: '1=1');
-    // print(await this.query());
   }
 
   Future<List<Map<String,dynamic>>> search(String search) async {
     Database db = await database;
     List<Map> maps = await db.query(table,
         columns: ['id', 'name', 'spent'],where: 'name LIKE ?',whereArgs: ['%$search%']);
-    // print(maps);
-    // print(197);
     if(maps.length>0){
       return maps;
     }
     return [];
   }
 
+  Future<String> getCardName(int id)async{
+    Database db = await database;
+    dynamic h = await db.query(table,columns: ['name'],where: 'id =?',whereArgs: [id]);
+    return h[0]['name'];
+  }
 
 }

@@ -35,12 +35,19 @@ class _HomeState extends State<Home> {
         style: GoogleFonts.openSans(),
       ),
     );
+    FocusScope.of(context).unfocus();
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
     List<Map<String,dynamic>> itm = await db.query();
     List<Map<String,dynamic>> temp = [];
     itm.forEach((element) {temp.add(jsonDecode(jsonEncode(element)));});
     this.setState(() {
       this.items=temp;
+      if(this.addnew==1){
+        this.addnew=0;
+        this.cmd='Add';
+        this.icon = Icon(Icons.add,size:30.0,color: Colors.blueAccent);
+      }
+      this.editing=0;
     });
   }
 
@@ -287,6 +294,7 @@ class _HomeState extends State<Home> {
                 contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
                 border: UnderlineInputBorder(),
               ),
+              textAlign: TextAlign.center,
             ),
             height: 50.0,
             width: 200.0,
@@ -305,6 +313,7 @@ class _HomeState extends State<Home> {
                 contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
                 border: UnderlineInputBorder(),
               ),
+              textAlign: TextAlign.center,
             ),
             height: 50.0,
             width: 200.0,
@@ -330,7 +339,7 @@ class _HomeState extends State<Home> {
                 }
                 else{
                   if(price.toString().length==0){price=0;}
-                  price=int.parse(price);
+                  else price=int.tryParse(price);
                   int rndid=rnd.nextInt(10000);
                   Map<String,dynamic> l={'id':rndid,'name':name,'spent':price};
                   Map<String,dynamic> l1={
