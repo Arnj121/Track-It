@@ -227,7 +227,9 @@ class _HomeState extends State<Home> {
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.orangeAccent,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white,
             items: [
               BottomNavigationBarItem(
                 icon: IconButton(
@@ -237,12 +239,12 @@ class _HomeState extends State<Home> {
                       if(this.addnew==1){
                         this.addnew=0;
                         this.cmd='Add';
-                        this.icon = Icon(Icons.add,size:30.0,color: Colors.blueAccent);
+                        this.icon = Icon(Icons.add,size:30.0,color: Colors.white);
                       }
                       else{
                         this.addnew=1;
                         this.cmd='Cancel';
-                        this.icon = Icon(Icons.remove,size:30.0,color: Colors.blueAccent);
+                        this.icon = Icon(Icons.remove,size:30.0,color: Colors.white);
                       }
                     });},
                 ),

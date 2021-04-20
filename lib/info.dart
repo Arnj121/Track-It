@@ -597,7 +597,9 @@ class _InfoState extends State<Info> {
                 ]
             ),
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.white,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white,
+          backgroundColor: Colors.redAccent[400],
             items:[
               BottomNavigationBarItem(
                 icon:IconButton(
@@ -608,7 +610,7 @@ class _InfoState extends State<Info> {
                   icon: Icon(
                     Icons.sync,
                     size: 30.0,
-                    color: Colors.redAccent,
+                    color: Colors.white,
                   ),
                 ),
                 label: 'Reset',
@@ -621,7 +623,7 @@ class _InfoState extends State<Info> {
                   icon: Icon(
                     Icons.history_outlined,
                     size: 30.0,
-                    color: Colors.redAccent,
+                    color: Colors.white,
                   ),
                 ),
                 label: 'History'
