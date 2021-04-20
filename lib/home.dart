@@ -15,12 +15,8 @@ class _HomeState extends State<Home> {
   List<Map<String,dynamic>> items= [];
   dynamic limit=[];
   List<Color> colors = [Colors.purple[200],Colors.red[300],Colors.pinkAccent[400],Colors.blueAccent,Colors.orange[300],Colors.greenAccent];
-  Color nameFontColor=Colors.grey[850];
-  Color priceFontColor=Colors.blueGrey[700];
-  Color iconColor = Colors.blueGrey[700];
-  Color iconBackColor = Colors.grey[100];
   var rnd = Random();
-  Icon icon = Icon(Icons.add,size:30.0,color: Colors.blueAccent);String cmd='Add';
+  Icon icon = Icon(Icons.add,size:30.0,color: Colors.white);String cmd='Add';
   int empty,addnew=0,crossAxisCount=1,editing=0,index,search=0;dynamic searchtext='No';
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
@@ -45,7 +41,7 @@ class _HomeState extends State<Home> {
       if(this.addnew==1){
         this.addnew=0;
         this.cmd='Add';
-        this.icon = Icon(Icons.add,size:30.0,color: Colors.blueAccent);
+        this.icon = Icon(Icons.add,size:30.0,color: Colors.white);
       }
       this.editing=0;
     });
@@ -214,13 +210,21 @@ class _HomeState extends State<Home> {
                       if(empty==0)
                         return this.griditems(items[index], index);
                       else
-                        return this.addNewItemCard();
+                        return Center(
+                          child: Text(
+                            'No cards added',
+                            style: GoogleFonts.openSans(
+                              fontSize: 20,
+                              color: Colors.blueGrey[800]
+                            ),
+                          ),
+                        );
                     },
                     childCount: this.items.length ==0 ? 1: this.items.length
                 ),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   mainAxisSpacing: 10.0,
-                  crossAxisCount: 2,
+                  crossAxisCount: this.items.length==0?1:2,
                   crossAxisSpacing: 2.0,
                 ),
               ),
@@ -252,7 +256,7 @@ class _HomeState extends State<Home> {
               ),
               BottomNavigationBarItem(
                 icon: IconButton(
-                  icon: Icon(Icons.info_outline,size: 30.0,color:Colors.blueAccent),
+                  icon: Icon(Icons.info_outline,size: 30.0,color:Colors.white),
                   onPressed: ()async{
                     FocusScope.of(context).unfocus();
                     dynamic ret = await Navigator.pushNamed(context, '/info',arguments:this.items);
@@ -274,18 +278,16 @@ class _HomeState extends State<Home> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
+          CircleAvatar(
             child: Icon(
               Icons.money,
-              size: 30.0,
-              color: this.iconColor,
+              size: 35.0,
+              color: Colors.white,
             ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50.0),
-              color: this.iconBackColor,
-            ),
-            padding: EdgeInsets.all(8.0),
+            backgroundColor: Colors.orangeAccent,
+            maxRadius: 30,
           ),
+          SizedBox(height: 10,),
           Container(
             child:TextField(
               style: GoogleFonts.openSans(),
@@ -297,10 +299,12 @@ class _HomeState extends State<Home> {
                 border: UnderlineInputBorder(),
               ),
               textAlign: TextAlign.center,
+              cursorHeight: 20,
             ),
             height: 50.0,
             width: 200.0,
           ),
+          SizedBox(height: 10,),
           Container(
             child:TextField(
               style: GoogleFonts.openSans(),
@@ -316,16 +320,18 @@ class _HomeState extends State<Home> {
                 border: UnderlineInputBorder(),
               ),
               textAlign: TextAlign.center,
+              cursorHeight: 20,
             ),
             height: 50.0,
             width: 200.0,
           ),
-          Container(
+          SizedBox(height: 15,),
+          CircleAvatar(
             child: IconButton(
               icon: Icon(
                 Icons.add,
                 size: 30.0,
-                color: Colors.blueGrey[900],
+                color: Colors.white,
               ),
               onPressed: () async{
                 String name = this.nameController.text;
@@ -379,16 +385,12 @@ class _HomeState extends State<Home> {
                 }
               },
             ),
-            // padding: EdgeInsets.symmetric(vertical: 0,horizontal: 5.0),
-            margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(100.0),
-              color: Colors.redAccent[400],
-            ),
+            backgroundColor: Colors.redAccent[400],
+            maxRadius: 25,
           ),
         ],
       ),
-      padding: EdgeInsets.symmetric(vertical: 5.0,horizontal: 5.0),
+      padding: EdgeInsets.symmetric(vertical: 15.0,horizontal: 5.0),
       margin: EdgeInsets.symmetric(vertical: 10.0,horizontal: 20.0),
       decoration: BoxDecoration(
         borderRadius:BorderRadius.circular(10),
@@ -398,68 +400,36 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Container addNewItemCard(){
-    int l=rnd.nextInt(this.colors.length);
-    return Container(
-      child: Center(
-        child: TextButton.icon(
-          icon: Icon(
-            Icons.add,
-            size: 30.0,
-            color: Colors.blueGrey[600],
-          ),
-          label: Text(
-            'Add Item',
-            style: GoogleFonts.openSans(
-              fontSize: 20.0,
-              color: Colors.blueGrey[600],
-            ),
-          ),
-          onPressed: (){
-            this.setState(() {this.addnew=1;});
-          },
-        ),
-      ),
-      padding: EdgeInsets.all(10.0),
-      margin: EdgeInsets.symmetric(vertical: 3.0,horizontal: 3.0),
-      decoration: BoxDecoration(
-        borderRadius:BorderRadius.circular(10),
-        // border: Border.all(width: 1.0,color: Colors.grey[700]),
-        color: this.colors[l],
-      ),
-    );
-  }
-
   Container showEditWindow(){
     return Container(
       child: Column(
         children: [
-          Container(
+          CircleAvatar(
             child: Icon(
               Icons.money,
-              size: 30.0,
-              color: this.iconColor,
+              size: 35.0,
+              color: Colors.white,
             ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50.0),
-              color: this.iconBackColor,
-            ),
-            padding: EdgeInsets.all(8.0),
+            maxRadius: 30,
+            backgroundColor: Colors.orangeAccent,
           ),
+          SizedBox(height: 10,),
           Text(
             this.editingName,
             style: GoogleFonts.openSans(
                 fontSize: 20.0,
-                color: this.nameFontColor
+                color: Colors.blueGrey[800]
             ),
           ),
+          SizedBox(height: 10,),
           Text(
             'Rs '+this.editingPrice.toString()+'.00',
             style: GoogleFonts.openSans(
                 fontSize: 20.0,
-                color: this.priceFontColor
+                color: Colors.blueGrey[800]
             ),
           ),
+          SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -467,7 +437,7 @@ class _HomeState extends State<Home> {
               IconButton(
                   icon: Icon(
                     Icons.remove,
-                    color: Colors.redAccent,
+                    color: Colors.redAccent[400],
                     size: 30.0,
                   ),
                   onPressed: ()async{
@@ -521,9 +491,9 @@ class _HomeState extends State<Home> {
                   controller: this.editController,
                   textAlign: TextAlign.center,
                   decoration:InputDecoration(
-                    labelText: 'Enter a value to add',
+                    labelText: 'Enter a value',
                     labelStyle: GoogleFonts.openSans(),
-                    contentPadding: EdgeInsets.symmetric(vertical: 2.0,horizontal: 5.0),
+                    contentPadding: EdgeInsets.symmetric(vertical: 0.0,horizontal: 5.0),
                     border: UnderlineInputBorder(),
                   ) ,
                   keyboardType: TextInputType.number ,
@@ -618,30 +588,27 @@ class _HomeState extends State<Home> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Container(
+          CircleAvatar(
             child: Icon(
               Icons.money,
-              size: 30.0,
-              color: this.iconColor,
+              size: 35.0,
+              color: Colors.blueGrey[800],
             ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50.0),
-              color: this.iconBackColor,
-            ),
-            padding: EdgeInsets.all(8.0),
+            maxRadius: 30,
+            backgroundColor: Colors.white,
           ),
           Text(
             item['name'],
             style: GoogleFonts.openSans(
                 fontSize: 20.0,
-                color: this.nameFontColor
+                color: Colors.blueGrey[800]
             ),
           ),
           Text(
             'Rs '+item['spent'].toString()+'.00',
                 style: GoogleFonts.openSans(
                     fontSize: 20.0,
-                    color: this.priceFontColor
+                    color: Colors.blueGrey[800]
                 ),
           ),
           Row(
@@ -694,7 +661,6 @@ class _HomeState extends State<Home> {
       margin: EdgeInsets.symmetric(vertical: 3.0,horizontal: 3.0),
       decoration: BoxDecoration(
         borderRadius:BorderRadius.circular(10),
-        // border: Border.all(width: 1.0,color: Colors.grey[700]),
         color: this.colors[l],
       ),
     );

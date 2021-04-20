@@ -138,19 +138,17 @@ class _InfoState extends State<Info> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
+                                  SizedBox(height: 10,),
+                                  CircleAvatar(
                                     child: Icon(
                                       Icons.money_sharp,
                                       size: 50.0,
                                       color: Colors.blueGrey[700],
                                     ),
-                                    padding: EdgeInsets.all(10.0),
-                                    margin: EdgeInsets.all(10.0),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(100.0)
-                                    ),
+                                    maxRadius: 40,
+                                    backgroundColor: Colors.white,
                                   ),
+                                  SizedBox(height: 10,),
                                   Text(
                                     'Money Spent Today',
                                     style: GoogleFonts.openSans(
@@ -681,6 +679,13 @@ class _InfoState extends State<Info> {
               color: color
           ),
         ),
+        header: Text(
+          l['value'].toString()+' / '+l['limitval'].toString(),
+          style: GoogleFonts.openSans(
+            color: Colors.deepPurpleAccent,
+            fontSize:20
+          ),
+        ),
         footer: Container(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -706,10 +711,14 @@ class _InfoState extends State<Info> {
   Container TodayCardBuilder(int index){
     return Container(
       child: ListTile(
-        leading: Icon(
-          Icons.money_sharp,
-          size: 30.0,
-          color: Colors.white,
+        leading: CircleAvatar(
+          child: Icon(
+            Icons.money_sharp,
+            size: 30.0,
+            color: Colors.redAccent[400],
+          ),
+          maxRadius: 20,
+          backgroundColor: Colors.white,
         ),
         title: Text(
           this.todayCard[index]['name'],
@@ -734,7 +743,7 @@ class _InfoState extends State<Info> {
       ),
       margin: EdgeInsets.symmetric(vertical: 3.0,horizontal: 5.0),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(5.0),
         color: Colors.redAccent[400],
       ),
     );
@@ -750,14 +759,14 @@ class _InfoState extends State<Info> {
             this.spendings[index]['title'],
             style: GoogleFonts.openSans(
               fontSize: 20.0,
-              color: Colors.blueGrey[600]
+              color: Colors.white
             ),
           ),
           Text(
             this.spendings[index]['item'],
             style: GoogleFonts.openSans(
               fontSize: 25.0,
-              color: Colors.grey[800],
+              color: Colors.grey[700],
             ),
           ),
           Text(
@@ -772,8 +781,8 @@ class _InfoState extends State<Info> {
       padding: EdgeInsets.all(5.0),
       margin: EdgeInsets.symmetric(vertical: 2.0,horizontal: 3.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        color: Colors.amber[700]
+        borderRadius: BorderRadius.circular(5.0),
+        color: Colors.orangeAccent
       ),
 
     );
@@ -785,18 +794,14 @@ class _InfoState extends State<Info> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
+          CircleAvatar(
             child: Icon(
               Icons.money_sharp,
-              size: 50.0,
+              size: 55.0,
               color: Colors.blueGrey[700],
             ),
-            padding: EdgeInsets.all(10.0),
-            margin: EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(100.0)
-            ),
+            maxRadius: 40,
+            backgroundColor: Colors.white,
           ),
           Text(
             'Total Money spent',
@@ -817,7 +822,7 @@ class _InfoState extends State<Info> {
       padding: EdgeInsets.symmetric(vertical: 5.0,horizontal: 2.0),
       margin: EdgeInsets.symmetric(vertical: 5.0,horizontal: 5.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(5.0),
         color: Colors.blueAccent,
       ),
     );
